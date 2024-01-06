@@ -3,7 +3,9 @@ import (
     "fmt"
     "os"
     "mapreduce/cli"
+    "mapreduce/fileHandler"
 )
+
 func main() {
     fmt.Println("hello world")
     for _, val := range os.Args {
@@ -13,5 +15,12 @@ func main() {
     fmt.Println(options.MultiProcess)
     if (options.MultiProcess) {
         fmt.Println("Multiprocess mode enabled")
+    }
+
+    success := fileHandler.OutputToFile("Hello world to file!", "newFile.txt")
+    if success {
+        fmt.Println("Successfully wrote to file")
+    } else {
+        fmt.Println("Failed to write to file")
     }
 }
