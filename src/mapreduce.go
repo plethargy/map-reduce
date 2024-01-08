@@ -4,6 +4,7 @@ import (
     "os"
     "mapreduce/cli"
     "mapreduce/fileHandler"
+    "mapreduce/worker"
 )
 
 func main() {
@@ -23,4 +24,9 @@ func main() {
     } else {
         fmt.Println("Failed to write to file")
     }
+    var mapWorker worker.Worker = worker.MapWorker{ TestField : "mapper"}
+    var reduceWorker worker.Worker = worker.ReduceWorker{ TestField: "reducer" }
+
+    mapWorker.Execute()
+    reduceWorker.Execute()
 }
