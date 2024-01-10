@@ -29,4 +29,8 @@ func main() {
 
     mapWorker.Execute()
     reduceWorker.Execute()
+
+    standardCoordinator := worker.StandardWorkerCoordinator{}
+    standardCoordinator.RegisterMapWorker(&mapWorker)
+    standardCoordinator.RegisterReduceWorker(&reduceWorker)
 }

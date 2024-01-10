@@ -7,8 +7,9 @@ type Worker interface {
 }
 
 type Coordinator interface {
-    RegisterWorker(w *Worker)
+    RegisterReduceWorker(w *Worker)
     MapReduce() bool
+    RegisterMapWorker(w *Worker) //TODO: Revisit this, I don't like having two separate functions, but I don't want to import an entire package just to do reflection on the types.
 }
 
 type MapWorker struct {
@@ -25,4 +26,19 @@ func (w MapWorker) Execute() {
 
 func (w ReduceWorker) Execute() {
     fmt.Println(w.TestField)
+}
+
+type StandardWorkerCoordinator struct {
+    MapWorkerList []Worker
+    ReduceWorkerList []Worker
+}
+//TODO: Add a bunch more validation and logic to the appending
+func (swc StandardWorkerCoordinator) RegisterReduceWorker(w * Worker) {
+    swc.ReduceWorkerList = append(swc.ReduceWorkerList, *w)
+    fmt.Println("Appended a reducer")
+}
+
+func (swc StandardWorkerCoordinator) RegisterMapWorker(w *Worker) {
+    swc.MapWorkerList = append(swc.MapWorkerList, *w)
+    fmt.Println("Appended a mapper")
 }
