@@ -7,8 +7,14 @@ import (
     "fmt"
 )
 
-func OutputToFile(output string, fileName string) bool {
-    
+type OutputStream interface {
+    OutputData(output string, fileName string) bool
+}
+
+type FileBasedOutputStream struct { //TODO: Extract to separate files before this gets bloated
+}
+
+func (f FileBasedOutputStream) OutputData(output string, fileName string) bool {
     if !checkFileExistence(fileName) {
         createFile(fileName)
     }
