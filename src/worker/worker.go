@@ -2,14 +2,20 @@ package worker
 
 import "fmt"
 
+type WorkerType int
+
+const (
+    Reducer WorkerType = iota
+    Mapper
+)
 type Worker interface {
     Execute()
+    GetWorkerType() WorkerType
 }
 
 type Coordinator interface {
-    RegisterReduceWorker(w *Worker)
+    RegisterWorker(w Worker)
     MapReduce() bool
-    RegisterMapWorker(w *Worker) //TODO: Revisit this, I don't like having two separate functions, but I don't want to import an entire package just to do reflection on the types.
 }
 
 type MapWorker struct {
@@ -24,8 +30,15 @@ func (w MapWorker) Execute() {
     fmt.Println(w.TestField)
 }
 
+func (w MapWorker) GetWorkerType() WorkerType {
+    return Mapper
+}
 func (w ReduceWorker) Execute() {
     fmt.Println(w.TestField)
+}
+
+func (w ReduceWorker) GetWorkerType() WorkerType {
+    return Reducer
 }
 
 type StandardWorkerCoordinator struct {
@@ -33,12 +46,23 @@ type StandardWorkerCoordinator struct {
     ReduceWorkerList []Worker
 }
 //TODO: Add a bunch more validation and logic to the appending
-func (swc StandardWorkerCoordinator) RegisterReduceWorker(w * Worker) {
-    swc.ReduceWorkerList = append(swc.ReduceWorkerList, *w)
-    fmt.Println("Appended a reducer")
+func (swc *StandardWorkerCoordinator) RegisterWorker(w Worker) {
+    switch w.GetWorkerType() {
+        case Reducer: {
+            swc.ReduceWorkerList = append(swc.ReduceWorkerList, w)
+            fmt.Println("Appended a reducer")
+        }
+        case Mapper: {
+            swc.MapWorkerList = append(swc.MapWorkerList, w)
+            fmt.Println("Appended a reducer")
+        }
+    }
+    fmt.Println("The size of reducer list is: ", len(swc.ReduceWorkerList))
+    fmt.Println("The size of mapper list is: ", len(swc.MapWorkerList))
+
 }
 
-func (swc StandardWorkerCoordinator) RegisterMapWorker(w *Worker) {
-    swc.MapWorkerList = append(swc.MapWorkerList, *w)
-    fmt.Println("Appended a mapper")
+func (swc StandardWorkerCoordinator) PrintLists() {
+    fmt.Println("The size of reducer list is: ", len(swc.ReduceWorkerList))
+    fmt.Println("The size of mapper list is: ", len(swc.MapWorkerList))
 }

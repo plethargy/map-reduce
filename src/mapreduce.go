@@ -31,6 +31,7 @@ func main() {
     reduceWorker.Execute()
 
     standardCoordinator := worker.StandardWorkerCoordinator{}
-    standardCoordinator.RegisterMapWorker(&mapWorker)
-    standardCoordinator.RegisterReduceWorker(&reduceWorker)
+    standardCoordinator.RegisterWorker(mapWorker)
+    standardCoordinator.RegisterWorker(reduceWorker)
+    standardCoordinator.PrintLists()
 }
