@@ -24,6 +24,11 @@ func main() {
     } else {
         fmt.Println("Failed to write to file")
     }
+    data := fileHandler.FileBasedInputStream{}.RetrieveInput("inputTest.txt")
+    fmt.Println(string(data))
+    nilData := fileHandler.FileBasedInputStream{}.RetrieveInput("fakeFile.txt")
+    fmt.Println("Nil data is: ", nilData)
+
     var mapWorker worker.Worker = worker.MapWorker{ TestField : "mapper"}
     var reduceWorker worker.Worker = worker.ReduceWorker{ TestField: "reducer" }
 

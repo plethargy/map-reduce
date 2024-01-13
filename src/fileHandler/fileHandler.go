@@ -11,7 +11,26 @@ type OutputStream interface {
     OutputData(output string, fileName string) bool
 }
 
+type InputStream interface {
+    RetrieveInput(fileName string) []byte 
+}
+
 type FileBasedOutputStream struct { //TODO: Extract to separate files before this gets bloated
+}
+
+type FileBasedInputStream struct {
+}
+
+func (f FileBasedInputStream) RetrieveInput(fileName string) []byte {
+    if !checkFileExistence(fileName) {
+        return nil
+    }
+    data, err := os.ReadFile(fileName) //this will definitely need changing to support larger volumes of data, reading it all into memory at once is bad
+    if err != nil {
+        fmt.Println("Error retrieving data", err)
+        return nil
+    }
+    return data
 }
 
 func (f FileBasedOutputStream) OutputData(output string, fileName string) bool {
