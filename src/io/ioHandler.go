@@ -1,4 +1,4 @@
-package fileHandler
+package io
 //This should print the output from reduce and handle input for map. 
 //For now this will just export an output function that can be called from the reducer workers.
 //Lets keep it super simple (single-thread, single-execution) for now, we'll need to add consistency and rollbacks for when this is multi-process and multi-thread.
@@ -14,32 +14,6 @@ type OutputStream interface {
 type InputStream interface {
     RetrieveInput(fileName string) []byte 
 }
-
-type FileBasedOutputStream struct { //TODO: Extract to separate files before this gets bloated
-}
-
-type FileBasedInputStream struct {
-}
-
-func (f FileBasedInputStream) RetrieveInput(fileName string) []byte {
-    if !checkFileExistence(fileName) {
-        return nil
-    }
-    data, err := os.ReadFile(fileName) //this will definitely need changing to support larger volumes of data, reading it all into memory at once is bad
-    if err != nil {
-        fmt.Println("Error retrieving data", err)
-        return nil
-    }
-    return data
-}
-
-func (f FileBasedOutputStream) OutputData(output string, fileName string) bool {
-    if !checkFileExistence(fileName) {
-        createFile(fileName)
-    }
-    return writeToFile([]byte(output), fileName)
-}
-
 
 func checkFileExistence(fileName string) bool {
     _, err := os.Stat(fileName)

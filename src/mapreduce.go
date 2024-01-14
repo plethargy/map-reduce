@@ -3,7 +3,7 @@ import (
     "fmt"
     "os"
     "mapreduce/cli"
-    "mapreduce/fileHandler"
+    "mapreduce/io"
     "mapreduce/worker"
 )
 
@@ -18,15 +18,15 @@ func main() {
         fmt.Println("Multiprocess mode enabled")
     }
 
-    success := fileHandler.FileBasedOutputStream{}.OutputData("Hello world to file! From interface implementation", "newFile.txt")
+    success := io.FileBasedOutputStream{}.OutputData("Hello world to file! From interface implementation", "newFile.txt")
     if success {
         fmt.Println("Successfully wrote to file")
     } else {
         fmt.Println("Failed to write to file")
     }
-    data := fileHandler.FileBasedInputStream{}.RetrieveInput("inputTest.txt")
+    data := io.FileBasedInputStream{}.RetrieveInput("inputTest.txt")
     fmt.Println(string(data))
-    nilData := fileHandler.FileBasedInputStream{}.RetrieveInput("fakeFile.txt")
+    nilData := io.FileBasedInputStream{}.RetrieveInput("fakeFile.txt")
     fmt.Println("Nil data is: ", nilData)
 
     var mapWorker worker.Worker = worker.MapWorker{ TestField : "mapper"}
