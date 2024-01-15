@@ -5,6 +5,7 @@ import (
     "mapreduce/cli"
     "mapreduce/io"
     "mapreduce/worker"
+    "mapreduce/partition"
 )
 
 func main() {
@@ -39,4 +40,8 @@ func main() {
     standardCoordinator.RegisterWorker(mapWorker)
     standardCoordinator.RegisterWorker(reduceWorker)
     standardCoordinator.PrintLists()
+
+    partitioner := partition.NoOpDataPartitioner{}
+    verbatimData := partitioner.Execute(partition.NoOpDataPartitionStrategy{}, []byte("testWithStringPartitioner"))
+    fmt.Printf("Partitioned data is: %s and the identifier is: %s\n", verbatimData.Data, verbatimData.Identifier)
 }
