@@ -41,7 +41,8 @@ func main() {
     standardCoordinator.RegisterWorker(reduceWorker)
     standardCoordinator.PrintLists()
 
-    partitioner := partition.NoOpDataPartitioner{}
-    verbatimData := partitioner.Execute(partition.NoOpDataPartitionStrategy{}, []byte("testWithStringPartitioner"))
-    fmt.Printf("Partitioned data is: %s and the identifier is: %s\n", verbatimData.Data, verbatimData.Identifier)
+    partitioner := partition.SequentialDataPartitioner{}
+    success = partitioner.Execute([]byte("testWithStringPartitioner"))
+    fetchData := partitioner.YieldData()
+    fmt.Printf("Partitioned data is: %s and the identifier is: %s\n", fetchData.Data, fetchData.Identifier)
 }
