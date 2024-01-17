@@ -17,9 +17,6 @@ func (swc *StandardWorkerCoordinator) RegisterWorker(w Worker) {
             fmt.Println("Appended a reducer")
         }
     }
-    fmt.Println("The size of reducer list is: ", len(swc.ReduceWorkerList))
-    fmt.Println("The size of mapper list is: ", len(swc.MapWorkerList))
-
 }
 
 func (swc StandardWorkerCoordinator) PrintLists() {

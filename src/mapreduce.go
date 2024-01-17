@@ -6,6 +6,7 @@ import (
     "mapreduce/io"
     "mapreduce/worker"
     "mapreduce/partition"
+    "mapreduce/log"
 )
 
 func main() {
@@ -45,4 +46,11 @@ func main() {
     success = partitioner.Execute([]byte("testWithStringPartitioner"))
     fetchData := partitioner.YieldData()
     fmt.Printf("Partitioned data is: %s and the identifier is: %s\n", fetchData.Data, fetchData.Identifier)
+
+    os.Setenv("MAPREDUCE_LOG_DEBUG_ENABLED", "enabled")
+    log.ListEnvironmentVariables()
+    log.InitializeLog(log.LogOptions{DebugEnabled: options.LogDebugEnabled})
+    logger := log.StandardLogger{}
+    logger.Debug("This should only print if debug is enabled!")
+    logger.Info("This should always print!")
 }

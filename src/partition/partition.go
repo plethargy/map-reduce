@@ -28,7 +28,7 @@ func (dp NoOpDataPartitioner) YieldData() PartitionedData {
 
 type SequentialDataPartitioner struct {
     ChunkedData []PartitionedData
-    cursor int
+    cursor int //when this becomes multithreaded I will need to investigate how to handle the cursor increment in an atomic way
     maxChunks int
 }
 //This should eventually take in some options input that specifies chunk size
