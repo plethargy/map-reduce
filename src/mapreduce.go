@@ -49,8 +49,7 @@ func main() {
 
     os.Setenv("MAPREDUCE_LOG_DEBUG_ENABLED", "enabled")
     log.ListEnvironmentVariables()
-    log.InitializeLog(log.LogOptions{DebugEnabled: options.LogDebugEnabled})
-    logger := log.StandardLogger{}
+    logger := log.InitializeLog(log.LogOptions{DebugEnabled: options.LogDebugEnabled})
     logger.Debug("This should only print if debug is enabled!")
     logger.Info("This should always print!")
 }

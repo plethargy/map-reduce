@@ -43,9 +43,10 @@ func (sl StandardLogger) Error(output string) {
     fmt.Println(output) //TODO: make this actually warn on output
 }
 
-func InitializeLog(logOptions LogOptions) {
+func InitializeLog(logOptions LogOptions) Logger {
     os.Unsetenv("MAPREDUCE_LOG_DEBUG_ENABLED")
     if logOptions.DebugEnabled {
         os.Setenv("MAPREDUCE_LOG_DEBUG_ENABLED", "enabled")
     }
+    return StandardLogger{}
 }
