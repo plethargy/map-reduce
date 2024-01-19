@@ -25,7 +25,6 @@ func (dp NoOpDataPartitioner) YieldData() PartitionedData {
     return PartitionedData{}
 }
 
-
 type SequentialDataPartitioner struct {
     ChunkedData []PartitionedData
     cursor int //when this becomes multithreaded I will need to investigate how to handle the cursor increment in an atomic way
@@ -33,6 +32,7 @@ type SequentialDataPartitioner struct {
 }
 //This should eventually take in some options input that specifies chunk size
 //TODO: clean this up and add maaaaaaany error checks and modes
+//TODO: This needs to be rethought. We don't want to hold all the data in memory and then chunk it, we want to rely on reading from file, this and the file reader will need to be refactored, for now lets keep this simple.
 func (sdp *SequentialDataPartitioner) Execute(inputData []byte) bool {
     sdp.cursor = 0
     sdp.ChunkedData = nil
