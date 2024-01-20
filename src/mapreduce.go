@@ -52,4 +52,10 @@ func main() {
     logger := log.InitializeLog(log.LogOptions{DebugEnabled: options.LogDebugEnabled})
     logger.Debug("This should only print if debug is enabled!")
     logger.Info("This should always print!")
+    logger.Debug("testing out the new sequential byte array")
+    var partialInputReader io.PartialReadFileBasedInputStream = io.NewPartialFileReader(5)
+    partialData := partialInputReader.RetrieveInput("lineBasedTestInput.txt")
+    fmt.Println(string(partialData))
+    partialData = partialInputReader.RetrieveInput("lineBasedTestInput.txt")
+    fmt.Println(string(partialData))
 }
