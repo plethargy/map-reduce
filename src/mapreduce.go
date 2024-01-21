@@ -48,14 +48,19 @@ func main() {
     fmt.Printf("Partitioned data is: %s and the identifier is: %s\n", fetchData.Data, fetchData.Identifier)
 
     os.Setenv("MAPREDUCE_LOG_DEBUG_ENABLED", "enabled")
-    log.ListEnvironmentVariables()
     logger := log.InitializeLog(log.LogOptions{DebugEnabled: options.LogDebugEnabled})
     logger.Debug("This should only print if debug is enabled!")
     logger.Info("This should always print!")
     logger.Debug("testing out the new sequential byte array")
-    var partialInputReader io.PartialReadFileBasedInputStream = io.NewPartialFileReader(5)
-    partialData := partialInputReader.RetrieveInput("lineBasedTestInput.txt")
+    var partialInputReader io.InputStream = io.NewPartialFileReader(5, 'n')
+    partialData, _ := partialInputReader.RetrieveInput("lineBasedTestInput.txt")
     fmt.Println(string(partialData))
-    partialData = partialInputReader.RetrieveInput("lineBasedTestInput.txt")
+    partialData, _ = partialInputReader.RetrieveInput("lineBasedTestInput.txt")
     fmt.Println(string(partialData))
+
+    freshDataPartitioner := partition.NewSequentialDataPartitioner(20, "\n")
+    freshDataPartitioner.PartitionInput("lineBasedTestInput.txt")
+    firstData := freshDataPartitioner.YieldData()
+    fmt.Println("First data from partition is: ", string(firstData.Data))
+
 }

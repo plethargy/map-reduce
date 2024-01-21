@@ -12,7 +12,7 @@ type OutputStream interface {
 }
 
 type InputStream interface {
-    RetrieveInput(fileName string) []byte 
+    RetrieveInput(fileName string) ([]byte, error) 
 }
 
 func checkFileExistence(fileName string) bool {

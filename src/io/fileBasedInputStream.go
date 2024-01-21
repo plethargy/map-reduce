@@ -27,11 +27,12 @@ type PartialReadFileBasedInputStream struct {
     LinesToFetch int
     fileOpen bool
     bufferedReader *bufio.Reader
+    delimiter byte
 }
 
-func (p *PartialReadFileBasedInputStream) RetrieveInput(fileName string) []byte {
+func (p *PartialReadFileBasedInputStream) RetrieveInput(fileName string) ([]byte, error) {
     if !checkFileExistence(fileName) {
-        return nil
+        return nil, nil
     }
     var file *os.File
     if !p.fileOpen {
@@ -41,20 +42,22 @@ func (p *PartialReadFileBasedInputStream) RetrieveInput(fileName string) []byte 
     }
     byteArray := make([]byte, 0)
     for i := 0; i < p.LinesToFetch; i++ {
-        readData, err := p.bufferedReader.ReadBytes('\n')
+        readData, err := p.bufferedReader.ReadBytes(p.delimiter)
         byteArray = append(byteArray, readData...)
         if err != nil {
             if err == io.EOF {
                 defer file.Close()
                 p.fileOpen = false
+                return byteArray, err
             } else {
+                defer file.Close()
                 fmt.Println("Something fatal occurred reading in input", err)
             }
         }
     }
-    return byteArray
+    return byteArray, nil
 }
 
-func NewPartialFileReader(linesToFetchPerExecution int) PartialReadFileBasedInputStream {
-    return PartialReadFileBasedInputStream{LinesToFetch: linesToFetchPerExecution, fileOpen: false}
+func NewPartialFileReader(linesToFetchPerExecution int, delimiter byte) InputStream {
+    return &PartialReadFileBasedInputStream{LinesToFetch: linesToFetchPerExecution, fileOpen: false, delimiter: delimiter}
 }
