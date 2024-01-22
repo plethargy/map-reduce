@@ -8,7 +8,7 @@ import (
 )
 
 type OutputStream interface {
-    OutputData(output string, fileName string) bool
+    OutputData(output []byte, fileName string) bool
 }
 
 type InputStream interface {

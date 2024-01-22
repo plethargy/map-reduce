@@ -20,7 +20,7 @@ func main() {
         fmt.Println("Multiprocess mode enabled")
     }
 
-    success := io.FileBasedOutputStream{}.OutputData("Hello world to file! From interface implementation", "newFile.txt")
+    success := io.FileBasedOutputStream{}.OutputData([]byte("Hello world to file! From interface implementation"), "newFile.txt")
     if success {
         fmt.Println("Successfully wrote to file")
     } else {

@@ -21,7 +21,7 @@ type NoOpDataPartitionStrategy struct{
 type NoOpDataPartitioner struct{}
 
 func NewSequentialDataPartitioner(partitionSize int, delimter string) SequentialDataPartitioner {
-    return SequentialDataPartitioner{cursor: 0, maxChunks: partitionSize, reader: io.NewPartialFileReader(10, byte('\n')) } //TODO: fix mismatch potential between partitionSize and maxChunks
+    return SequentialDataPartitioner{cursor: 0, maxChunks: partitionSize, reader: io.NewPartialFileReader(10, byte('\n')), writer: io.FileBasedOutputStream{} } //TODO: fix mismatch potential between partitionSize and maxChunks
 }
 
 func NewPartitionedData(data []byte, identifier string) PartitionedData {
@@ -41,6 +41,7 @@ type SequentialDataPartitioner struct {
     cursor int //when this becomes multithreaded I will need to investigate how to handle the cursor increment in an atomic way
     maxChunks int
     reader io.InputStream
+    writer io.OutputStream
 }
 //This should eventually take in some options input that specifies chunk size
 //TODO: clean this up and add maaaaaaany error checks and modes
@@ -89,13 +90,14 @@ func (sdp *SequentialDataPartitioner) PartitionInput(fileName string) bool {
     if err != nil {
         fmt.Println("Retrieved all data in first call: ", string(data))
         sdp.ChunkedData = append(sdp.ChunkedData, NewPartitionedData(data, fmt.Sprint(count))) //TODO: remove this, we don't want to store the chunked data in our partitioner, this is just for initial testing
-        count++
+        sdp.outputChunkedData(data, count, "chunkedData")
     }
     var fetchedData []byte = nil
     for err == nil {
         if len(data) >= sdp.maxChunks {
             fmt.Println("Data received thus far: ", string(data)) //TODO: change this to write data to a smaller file
             sdp.ChunkedData = append(sdp.ChunkedData, NewPartitionedData(data, fmt.Sprint(count))) //TODO: remove this, we don't want to store the chunked data in our partitioner, this is just for initial testing
+            sdp.outputChunkedData(data, count, "chunkedData")
             data = nil
             count++
         }
@@ -103,4 +105,9 @@ func (sdp *SequentialDataPartitioner) PartitionInput(fileName string) bool {
         data = append(data, fetchedData...)
     }
     return true
+}
+
+func (sdp *SequentialDataPartitioner) outputChunkedData(data []byte, count int, filePattern string) {
+    countStringFormat := fmt.Sprint(count)
+    sdp.writer.OutputData(data, fmt.Sprintf("%s%s.txt", filePattern, countStringFormat))
 }
