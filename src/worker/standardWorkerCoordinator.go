@@ -4,6 +4,8 @@ import "fmt"
 type StandardWorkerCoordinator struct {
     MapWorkerList []Worker
     ReduceWorkerList []Worker
+    MapperInputFiles []string
+    ReducerInputFiles []string
 }
 //TODO: Add a bunch more validation and logic to the appending
 func (swc *StandardWorkerCoordinator) RegisterWorker(w Worker) {
@@ -14,7 +16,20 @@ func (swc *StandardWorkerCoordinator) RegisterWorker(w Worker) {
         }
         case Mapper: {
             swc.MapWorkerList = append(swc.MapWorkerList, w)
-            fmt.Println("Appended a reducer")
+            fmt.Println("Appended a mapper")
+        }
+    }
+}
+
+func (swc *StandardWorkerCoordinator) RegisterInputFile(filePath string, workerType WorkerType) {
+    switch workerType {
+        case Reducer: {
+            swc.ReducerInputFiles = append(swc.ReducerInputFiles, filePath)
+            fmt.Println("Appended a reducer file")
+        }
+        case Mapper: {
+            swc.MapperInputFiles = append(swc.MapperInputFiles, filePath)
+            fmt.Println("Appended a mapper file")
         }
     }
 }
