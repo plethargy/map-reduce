@@ -14,5 +14,6 @@ type Worker interface {
 type Coordinator interface {
     RegisterWorker(w Worker)
     MapReduce() bool
+    RegisterInputFile(fileName string, workerType WorkerType)
 }
 

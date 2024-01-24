@@ -42,6 +42,7 @@ type SequentialDataPartitioner struct {
     maxChunks int
     reader io.InputStream
     writer io.OutputStream
+    partionedFiles []string
 }
 //This should eventually take in some options input that specifies chunk size
 //TODO: clean this up and add maaaaaaany error checks and modes
@@ -109,5 +110,11 @@ func (sdp *SequentialDataPartitioner) PartitionInput(fileName string) bool {
 
 func (sdp *SequentialDataPartitioner) outputChunkedData(data []byte, count int, filePattern string) {
     countStringFormat := fmt.Sprint(count)
-    sdp.writer.OutputData(data, fmt.Sprintf("%s%s.txt", filePattern, countStringFormat))
+    fileName := fmt.Sprintf("%s%s.txt", filePattern, countStringFormat)
+    sdp.writer.OutputData(data, fileName)
+    sdp.partionedFiles = append(sdp.partionedFiles, fileName) 
+}
+
+func (sdp SequentialDataPartitioner) RetrieveInputFiles() []string {
+    return sdp.partionedFiles
 }

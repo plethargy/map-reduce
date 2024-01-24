@@ -63,4 +63,10 @@ func main() {
     firstData := freshDataPartitioner.YieldData()
     fmt.Println("First data from partition is: ", string(firstData.Data))
 
+    partitionedFiles := freshDataPartitioner.RetrieveInputFiles()
+
+    for _, val := range partitionedFiles {
+        standardCoordinator.RegisterInputFile(val, worker.Mapper)
+    }
+
 }
