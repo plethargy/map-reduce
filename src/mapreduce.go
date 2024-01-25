@@ -69,4 +69,6 @@ func main() {
         standardCoordinator.RegisterInputFile(val, worker.Mapper)
     }
 
+    standardCoordinator.MapReduce()
+
 }

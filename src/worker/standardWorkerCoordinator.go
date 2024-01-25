@@ -1,5 +1,8 @@
 package worker
-import "fmt"
+import (
+    "fmt"
+    "sync"
+)
 
 type StandardWorkerCoordinator struct {
     MapWorkerList []Worker
@@ -32,6 +35,20 @@ func (swc *StandardWorkerCoordinator) RegisterInputFile(filePath string, workerT
             fmt.Println("Appended a mapper file")
         }
     }
+}
+
+func (swc *StandardWorkerCoordinator) MapReduce() bool {
+    var wg sync.WaitGroup
+    for _, worker := range swc.MapWorkerList {
+        wg.Add(1)
+        go func(w Worker) {
+            defer wg.Done()
+            w.Execute()
+        }(worker)
+    }
+
+    wg.Wait()
+    return true
 }
 
 func (swc StandardWorkerCoordinator) PrintLists() {
