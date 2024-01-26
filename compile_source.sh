@@ -20,7 +20,7 @@ rm -rf $tempFileForPath #clean up filep
 
 goBin=$(which go)
 modulerootdir=$(pwd)
-packageList=("cli" "io" "worker" "partition" "log")
+packageList=("cli" "io" "worker" "partition" "log" "map" "reduce")
 
 for package in ${packageList[@]}; do 
 	cd "${modulerootdir}/src/${package}"

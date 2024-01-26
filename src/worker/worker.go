@@ -7,7 +7,7 @@ const (
     Mapper
 )
 type Worker interface {
-    Execute()
+    Execute(fileName string)
     GetWorkerType() WorkerType
 }
 

@@ -34,8 +34,8 @@ func main() {
     var mapWorker worker.Worker = worker.MapWorker{ TestField : "mapper"}
     var reduceWorker worker.Worker = worker.ReduceWorker{ TestField: "reducer" }
 
-    mapWorker.Execute()
-    reduceWorker.Execute()
+    mapWorker.Execute("fakefile")
+    reduceWorker.Execute("fakefile")
 
     standardCoordinator := worker.StandardWorkerCoordinator{}
     standardCoordinator.RegisterWorker(mapWorker)

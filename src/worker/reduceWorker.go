@@ -7,7 +7,7 @@ type ReduceWorker struct {
     TestField string //same as above
 }
 
-func (w ReduceWorker) Execute() {
+func (w ReduceWorker) Execute(fileName string) {
     fmt.Println(w.TestField)
 }
 

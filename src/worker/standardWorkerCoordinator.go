@@ -43,7 +43,7 @@ func (swc *StandardWorkerCoordinator) MapReduce() bool {
         wg.Add(1)
         go func(w Worker) {
             defer wg.Done()
-            w.Execute()
+            w.Execute("fakefile.txt")
         }(worker)
     }
 
