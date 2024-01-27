@@ -69,6 +69,6 @@ func main() {
         standardCoordinator.RegisterInputFile(val, worker.Mapper)
     }
 
-    standardCoordinator.MapReduce()
+    standardCoordinator.MapReduce(worker.NewMapReduceInput("fakePath", "fakeInput", "fakeOutput"))
 
 }

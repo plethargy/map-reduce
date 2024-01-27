@@ -4,6 +4,8 @@ import (
     "sync"
 )
 
+
+
 type StandardWorkerCoordinator struct {
     MapWorkerList []Worker
     ReduceWorkerList []Worker
@@ -37,7 +39,7 @@ func (swc *StandardWorkerCoordinator) RegisterInputFile(filePath string, workerT
     }
 }
 
-func (swc *StandardWorkerCoordinator) MapReduce() bool {
+func (swc *StandardWorkerCoordinator) MapReduce(m MapReduceInput) bool {
     var wg sync.WaitGroup
     for _, worker := range swc.MapWorkerList {
         wg.Add(1)
