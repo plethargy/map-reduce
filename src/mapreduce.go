@@ -42,11 +42,6 @@ func main() {
     standardCoordinator.RegisterWorker(reduceWorker)
     standardCoordinator.PrintLists()
 
-    partitioner := partition.SequentialDataPartitioner{}
-    success = partitioner.Execute([]byte("testWithStringPartitioner"))
-    fetchData := partitioner.YieldData()
-    fmt.Printf("Partitioned data is: %s and the identifier is: %s\n", fetchData.Data, fetchData.Identifier)
-
     os.Setenv("MAPREDUCE_LOG_DEBUG_ENABLED", "enabled")
     logger := log.InitializeLog(log.LogOptions{DebugEnabled: options.LogDebugEnabled})
     logger.Debug("This should only print if debug is enabled!")
@@ -60,8 +55,6 @@ func main() {
 
     freshDataPartitioner := partition.NewSequentialDataPartitioner(20, "\n")
     freshDataPartitioner.PartitionInput("lineBasedTestInput.txt")
-    firstData := freshDataPartitioner.YieldData()
-    fmt.Println("First data from partition is: ", string(firstData.Data))
 
     partitionedFiles := freshDataPartitioner.RetrieveInputFiles()
 
