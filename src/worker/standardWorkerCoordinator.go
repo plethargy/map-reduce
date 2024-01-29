@@ -2,6 +2,8 @@ package worker
 import (
     "fmt"
     "sync"
+    "mapreduce/map"
+    "mapreduce/reduce"
 )
 
 
@@ -11,6 +13,8 @@ type StandardWorkerCoordinator struct {
     ReduceWorkerList []Worker
     MapperInputFiles []string
     ReducerInputFiles []string
+    mapper mapper.Mapper
+    reducer reduce.Reducer
 }
 //TODO: Add a bunch more validation and logic to the appending
 func (swc *StandardWorkerCoordinator) RegisterWorker(w Worker) {
