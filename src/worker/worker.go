@@ -1,5 +1,10 @@
 package worker
 
+import (
+    "mapreduce/map"
+    "mapreduce/reduce"
+)
+
 type WorkerType int
 
 const (
@@ -15,6 +20,8 @@ type Coordinator interface {
     RegisterWorker(w Worker)
     MapReduce(m MapReduceInput) bool
     RegisterInputFile(fileName string, workerType WorkerType)
+    RegisterMapper(m mapper.Mapper)
+    RegisterReducer(r reduce.Reducer)
 }
 
 type MapReduceInput struct {

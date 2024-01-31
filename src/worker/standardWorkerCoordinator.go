@@ -61,3 +61,16 @@ func (swc StandardWorkerCoordinator) PrintLists() {
     fmt.Println("The size of reducer list is: ", len(swc.ReduceWorkerList))
     fmt.Println("The size of mapper list is: ", len(swc.MapWorkerList))
 }
+
+func NewStandardWorkerCoordinator() StandardWorkerCoordinator {
+    return StandardWorkerCoordinator{mapper: &mapper.NoOpMapper{}, reducer: &reduce.NoOpReducer{}}
+}
+
+func (swc *StandardWorkerCoordinator) RegisterMapper(m mapper.Mapper) {
+    swc.mapper = m
+}
+
+func (swc *StandardWorkerCoordinator) RegisterReducer(r reduce.Reducer) {
+    swc.reducer = r
+}
+
