@@ -13,8 +13,8 @@ type StandardWorkerCoordinator struct {
     ReduceWorkerList []Worker
     MapperInputFiles []string
     ReducerInputFiles []string
-    mapper mapper.Mapper
-    reducer reduce.Reducer
+    mapperFunc mapper.Mapper
+    reducerFunc reduce.Reducer
 }
 //TODO: Add a bunch more validation and logic to the appending
 func (swc *StandardWorkerCoordinator) RegisterWorker(w Worker) {
@@ -50,6 +50,7 @@ func (swc *StandardWorkerCoordinator) MapReduce(m MapReduceInput) bool {
         go func(w Worker) {
             defer wg.Done()
             w.Execute("fakefile.txt")
+            swc.mapperFunc.Map(mapper.MapInput{})
         }(worker)
     }
 
@@ -63,14 +64,14 @@ func (swc StandardWorkerCoordinator) PrintLists() {
 }
 
 func NewStandardWorkerCoordinator() StandardWorkerCoordinator {
-    return StandardWorkerCoordinator{mapper: &mapper.NoOpMapper{}, reducer: &reduce.NoOpReducer{}}
+    return StandardWorkerCoordinator{mapperFunc: &mapper.NoOpMapper{}, reducerFunc: &reduce.NoOpReducer{}}
 }
 
 func (swc *StandardWorkerCoordinator) RegisterMapper(m mapper.Mapper) {
-    swc.mapper = m
+    swc.mapperFunc = m
 }
 
 func (swc *StandardWorkerCoordinator) RegisterReducer(r reduce.Reducer) {
-    swc.reducer = r
+    swc.reducerFunc = r
 }
 

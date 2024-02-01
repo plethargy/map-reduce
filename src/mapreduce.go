@@ -37,7 +37,7 @@ func main() {
     mapWorker.Execute("fakefile")
     reduceWorker.Execute("fakefile")
 
-    standardCoordinator := worker.StandardWorkerCoordinator{}
+    standardCoordinator := worker.NewStandardWorkerCoordinator()
     standardCoordinator.RegisterWorker(mapWorker)
     standardCoordinator.RegisterWorker(reduceWorker)
     standardCoordinator.PrintLists()
