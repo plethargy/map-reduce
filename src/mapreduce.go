@@ -10,26 +10,13 @@ import (
 )
 
 func main() {
-    fmt.Println("hello world")
     for _, val := range os.Args {
         fmt.Println(val)
     }
     var options cli.CLIOptions = cli.ParseCommandLineInput()
-    fmt.Println(options.MultiProcess)
     if (options.MultiProcess) {
         fmt.Println("Multiprocess mode enabled")
     }
-
-    success := io.FileBasedOutputStream{}.OutputData([]byte("Hello world to file! From interface implementation"), "newFile.txt")
-    if success {
-        fmt.Println("Successfully wrote to file")
-    } else {
-        fmt.Println("Failed to write to file")
-    }
-    data := io.FileBasedInputStream{}.RetrieveInput("inputTest.txt")
-    fmt.Println(string(data))
-    nilData := io.FileBasedInputStream{}.RetrieveInput("fakeFile.txt")
-    fmt.Println("Nil data is: ", nilData)
 
     var mapWorker worker.Worker = worker.MapWorker{ TestField : "mapper"}
     var reduceWorker worker.Worker = worker.ReduceWorker{ TestField: "reducer" }
