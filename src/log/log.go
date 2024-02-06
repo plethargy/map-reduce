@@ -50,3 +50,22 @@ func InitializeLog(logOptions LogOptions) Logger {
     }
     return StandardLogger{}
 }
+
+type LogHandler struct {
+    logger Logger
+}
+
+func (lh LogHandler) Debug(output string) {
+    lh.logger.Debug(output)
+}
+func (lh LogHandler) Info(output string) {
+    lh.logger.Info(output)
+}
+func (lh LogHandler) Error(output string) {
+    lh.logger.Error(output)
+}
+func NewLogHandler(logger Logger) LogHandler {
+    return LogHandler{logger: logger}
+}
+
+
