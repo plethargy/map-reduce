@@ -8,16 +8,16 @@ import (
 
 
 
-type StandardWorkerCoordinator struct {
+type StandardWorkerCoordinator[T any] struct {
     MapWorkerList []Worker
     ReduceWorkerList []Worker
     MapperInputFiles []string
     ReducerInputFiles []string
-    mapperFunc mapper.Mapper
-    reducerFunc reduce.Reducer
+    mapperFunc mapper.Mapper[T]
+    reducerFunc reduce.Reducer[T]
 }
 //TODO: Add a bunch more validation and logic to the appending
-func (swc *StandardWorkerCoordinator) RegisterWorker(w Worker) {
+func (swc *StandardWorkerCoordinator[T]) RegisterWorker(w Worker) {
     switch w.GetWorkerType() {
         case Reducer: {
             swc.ReduceWorkerList = append(swc.ReduceWorkerList, w)
@@ -30,7 +30,7 @@ func (swc *StandardWorkerCoordinator) RegisterWorker(w Worker) {
     }
 }
 
-func (swc *StandardWorkerCoordinator) RegisterInputFile(filePath string, workerType WorkerType) {
+func (swc *StandardWorkerCoordinator[T]) RegisterInputFile(filePath string, workerType WorkerType) {
     switch workerType {
         case Reducer: {
             swc.ReducerInputFiles = append(swc.ReducerInputFiles, filePath)
@@ -43,7 +43,7 @@ func (swc *StandardWorkerCoordinator) RegisterInputFile(filePath string, workerT
     }
 }
 
-func (swc *StandardWorkerCoordinator) MapReduce(m MapReduceInput) bool {
+func (swc *StandardWorkerCoordinator[T]) MapReduce(m MapReduceInput) bool {
     var wg sync.WaitGroup
     for _, worker := range swc.MapWorkerList {
         wg.Add(1)
@@ -58,20 +58,20 @@ func (swc *StandardWorkerCoordinator) MapReduce(m MapReduceInput) bool {
     return true
 }
 
-func (swc StandardWorkerCoordinator) PrintLists() {
+func (swc StandardWorkerCoordinator[T]) PrintLists() {
     fmt.Println("The size of reducer list is: ", len(swc.ReduceWorkerList))
     fmt.Println("The size of mapper list is: ", len(swc.MapWorkerList))
 }
 
-func NewStandardWorkerCoordinator() StandardWorkerCoordinator {
-    return StandardWorkerCoordinator{mapperFunc: &mapper.NoOpMapper{}, reducerFunc: &reduce.NoOpReducer{}}
+func NewStandardWorkerCoordinator() StandardWorkerCoordinator[string] {
+    return StandardWorkerCoordinator[string]{mapperFunc: &mapper.NoOpMapper[string]{}, reducerFunc: &reduce.NoOpReducer[string]{}}
 }
 
-func (swc *StandardWorkerCoordinator) RegisterMapper(m mapper.Mapper) {
+func (swc *StandardWorkerCoordinator[T]) RegisterMapper(m mapper.Mapper[T]) {
     swc.mapperFunc = m
 }
 
-func (swc *StandardWorkerCoordinator) RegisterReducer(r reduce.Reducer) {
+func (swc *StandardWorkerCoordinator[T]) RegisterReducer(r reduce.Reducer[T]) {
     swc.reducerFunc = r
 }
 

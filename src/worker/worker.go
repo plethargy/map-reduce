@@ -16,12 +16,12 @@ type Worker interface {
     GetWorkerType() WorkerType
 }
 
-type Coordinator interface {
+type Coordinator[T any] interface {
     RegisterWorker(w Worker)
     MapReduce(m MapReduceInput) bool
     RegisterInputFile(fileName string, workerType WorkerType)
-    RegisterMapper(m mapper.Mapper)
-    RegisterReducer(r reduce.Reducer)
+    RegisterMapper(m mapper.Mapper[T])
+    RegisterReducer(r reduce.Reducer[T])
 }
 
 type MapReduceInput struct {
