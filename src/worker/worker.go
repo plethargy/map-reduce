@@ -11,17 +11,28 @@ const (
     Reducer WorkerType = iota
     Mapper
 )
+
+type WorkerStatus int 
+
+const(
+    Idle WorkerStatus = iota
+    Busy
+)
+
 type Worker interface {
-    Execute(fileName string)
+    ExecuteMap(fileName string, mapFunc mapper.MapFunction)
+    ExecuteReduce(fileName string, reduceFunc reduce.ReduceFunction)
     GetWorkerType() WorkerType
+    GetWorkerStatus() WorkerStatus
+    SetWorkerStatus(status WorkerStatus)
 }
 
-type Coordinator[T any] interface {
+type Coordinator interface {
     RegisterWorker(w Worker)
     MapReduce(m MapReduceInput) bool
     RegisterInputFile(fileName string, workerType WorkerType)
-    RegisterMapper(m mapper.Mapper[T])
-    RegisterReducer(r reduce.Reducer[T])
+    RegisterMapper(m mapper.MapFunction)
+    RegisterReducer(r reduce.ReduceFunction)
 }
 
 type MapReduceInput struct {

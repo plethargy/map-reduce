@@ -5,15 +5,15 @@ import "fmt"
 type ReduceInput struct {
 }
 //This is the interface that the client written reducer should adhere to.
-type Reducer[T any] interface {
-    Reduce(r ReduceInput) T
+type ReduceFunction interface {
+    Reduce(r ReduceInput) string
 }
 
-type NoOpReducer[T any] struct {
+type NoOpReducer struct {
 }
 
-func (nrd *NoOpReducer[T]) Reduce(r ReduceInput) T {
+func (nrd *NoOpReducer) Reduce(r ReduceInput) string {
     fmt.Println("Calling no op reducer")
-    var defaultResult T 
+    var defaultResult string
     return defaultResult
 }

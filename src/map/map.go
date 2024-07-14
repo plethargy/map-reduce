@@ -1,19 +1,26 @@
 package mapper
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type MapInput struct {
+    data []byte
 }
 //This is the interface intended to shape the function that client written Map functions should adhere to.
-type Mapper[T any] interface {
-    Map(m MapInput) T
+type MapFunction interface {
+    Map(m MapInput) string
 }
 
-type NoOpMapper[T any] struct {
+type NoOpMapper struct {
 }
 
-func (nmp *NoOpMapper[T]) Map(m MapInput) T {
+func (nmp *NoOpMapper) Map(m MapInput) string {
     fmt.Println("Calling No Op Mapper")
-    var defaultResult T 
+    var defaultResult string
     return defaultResult
+}
+
+func NewMapInput(inputData []byte) MapInput {
+    return MapInput{data: inputData}
 }

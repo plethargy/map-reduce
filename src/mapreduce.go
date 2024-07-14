@@ -18,11 +18,8 @@ func main() {
         fmt.Println("Multiprocess mode enabled")
     }
 
-    var mapWorker worker.Worker = worker.MapWorker{ TestField : "mapper"}
-    var reduceWorker worker.Worker = worker.ReduceWorker{ TestField: "reducer" }
-
-    mapWorker.Execute("fakefile")
-    reduceWorker.Execute("fakefile")
+    var mapWorker worker.Worker = &worker.MapWorker{ TestField : "mapper", Status: worker.Idle}
+    var reduceWorker worker.Worker = &worker.ReduceWorker{ TestField: "reducer", Status: worker.Idle }
 
     standardCoordinator := worker.NewStandardWorkerCoordinator()
     standardCoordinator.RegisterWorker(mapWorker)

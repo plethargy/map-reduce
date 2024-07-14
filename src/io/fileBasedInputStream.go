@@ -1,25 +1,27 @@
 package io
-import ( 
-    "fmt"
-    "os"
-    "bufio"
-    "io"
+
+import (
+	"bufio"
+	"errors"
+	"fmt"
+	"io"
+	"os"
 )
 var (
     newlineByteRepresentation byte = byte('\n')
 )
 type FileBasedInputStream struct {
 }
-func (f FileBasedInputStream) RetrieveInput(fileName string) []byte {
+func (f FileBasedInputStream) RetrieveInput(fileName string) ([]byte, error) {
     if !checkFileExistence(fileName) {
-        return nil
+        return nil, errors.New("File does not exist")
     }
     data, err := os.ReadFile(fileName) //this will definitely need changing to support larger volumes of data, reading it all into memory at once is bad
     if err != nil {
         fmt.Println("Error retrieving data", err)
-        return nil
+        return nil, err
     }
-    return data
+    return data, nil
 }
 
 
@@ -32,7 +34,7 @@ type PartialReadFileBasedInputStream struct {
 
 func (p *PartialReadFileBasedInputStream) RetrieveInput(fileName string) ([]byte, error) {
     if !checkFileExistence(fileName) {
-        return nil, nil
+        return nil, errors.New("File does not exist")
     }
     var file *os.File
     if !p.fileOpen {
@@ -60,4 +62,8 @@ func (p *PartialReadFileBasedInputStream) RetrieveInput(fileName string) ([]byte
 
 func NewPartialFileReader(linesToFetchPerExecution int, delimiter byte) InputStream {
     return &PartialReadFileBasedInputStream{LinesToFetch: linesToFetchPerExecution, fileOpen: false, delimiter: delimiter}
+}
+
+func NewFileReader() InputStream {
+    return &FileBasedInputStream{}
 }

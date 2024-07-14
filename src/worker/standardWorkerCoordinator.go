@@ -8,16 +8,16 @@ import (
 
 
 
-type StandardWorkerCoordinator[T any] struct {
+type StandardWorkerCoordinator struct {
     MapWorkerList []Worker
     ReduceWorkerList []Worker
     MapperInputFiles []string
     ReducerInputFiles []string
-    mapperFunc mapper.Mapper[T]
-    reducerFunc reduce.Reducer[T]
+    mapperFunc mapper.MapFunction
+    reducerFunc reduce.ReduceFunction
 }
 //TODO: Add a bunch more validation and logic to the appending
-func (swc *StandardWorkerCoordinator[T]) RegisterWorker(w Worker) {
+func (swc *StandardWorkerCoordinator) RegisterWorker(w Worker) {
     switch w.GetWorkerType() {
         case Reducer: {
             swc.ReduceWorkerList = append(swc.ReduceWorkerList, w)
@@ -30,7 +30,7 @@ func (swc *StandardWorkerCoordinator[T]) RegisterWorker(w Worker) {
     }
 }
 
-func (swc *StandardWorkerCoordinator[T]) RegisterInputFile(filePath string, workerType WorkerType) {
+func (swc *StandardWorkerCoordinator) RegisterInputFile(filePath string, workerType WorkerType) {
     switch workerType {
         case Reducer: {
             swc.ReducerInputFiles = append(swc.ReducerInputFiles, filePath)
@@ -43,35 +43,45 @@ func (swc *StandardWorkerCoordinator[T]) RegisterInputFile(filePath string, work
     }
 }
 
-func (swc *StandardWorkerCoordinator[T]) MapReduce(m MapReduceInput) bool {
+func (swc *StandardWorkerCoordinator) MapReduce(m MapReduceInput) bool {
+    // we want to ensure every file gets handled before moving to the Reducers 
+    // this will iterate through each file and hand it to a MapWorker if one is Idle, if they're all busy it will spin
+    // until one becomes Idle.
+    var fileIndex = 0
     var wg sync.WaitGroup
-    for _, worker := range swc.MapWorkerList {
-        wg.Add(1)
-        go func(w Worker) {
-            defer wg.Done()
-            w.Execute("fakefile.txt")
-            swc.mapperFunc.Map(mapper.MapInput{})
-        }(worker)
+    inputFileLength := len(swc.MapperInputFiles)
+    for fileIndex < inputFileLength {
+        for _, worker := range swc.MapWorkerList {
+            if worker.GetWorkerStatus() == Idle && fileIndex < inputFileLength {
+                wg.Add(1)
+                worker.SetWorkerStatus(Busy)
+                go func(w Worker, indx int) {
+                    defer wg.Done()
+                    worker.ExecuteMap(swc.MapperInputFiles[indx], swc.mapperFunc)
+                    //swc.mapperFunc.Map(mapper.MapInput{})
+                }(worker, fileIndex)
+                fileIndex += 1
+            }
+        }
+        wg.Wait()
     }
-
-    wg.Wait()
     return true
 }
 
-func (swc StandardWorkerCoordinator[T]) PrintLists() {
+func (swc StandardWorkerCoordinator) PrintLists() {
     fmt.Println("The size of reducer list is: ", len(swc.ReduceWorkerList))
     fmt.Println("The size of mapper list is: ", len(swc.MapWorkerList))
 }
 
-func NewStandardWorkerCoordinator() StandardWorkerCoordinator[string] {
-    return StandardWorkerCoordinator[string]{mapperFunc: &mapper.NoOpMapper[string]{}, reducerFunc: &reduce.NoOpReducer[string]{}}
+func NewStandardWorkerCoordinator() StandardWorkerCoordinator {
+    return StandardWorkerCoordinator{mapperFunc: &mapper.NoOpMapper{}, reducerFunc: &reduce.NoOpReducer{}}
 }
 
-func (swc *StandardWorkerCoordinator[T]) RegisterMapper(m mapper.Mapper[T]) {
+func (swc *StandardWorkerCoordinator) RegisterMapper(m mapper.MapFunction) {
     swc.mapperFunc = m
 }
 
-func (swc *StandardWorkerCoordinator[T]) RegisterReducer(r reduce.Reducer[T]) {
+func (swc *StandardWorkerCoordinator) RegisterReducer(r reduce.ReduceFunction) {
     swc.reducerFunc = r
 }
 
