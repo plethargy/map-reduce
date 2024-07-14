@@ -8,4 +8,4 @@ Pull the code, and run the `compile_source.sh` bash script.
 In your root directory, navigate to the bin/ folder (`cd bin`) and then you can run using (`./mapreduce`)
 
 # A small flow diagram
-![Alt text](./MapReduceFlowSVG.svg)
+![Alt text](./resources/map_reduce_flow.svg)
