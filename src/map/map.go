@@ -8,7 +8,6 @@ type MapInput struct {
 type Mapper[T any] interface {
     Map(m MapInput) T
 }
-//TODO: Figure out how to get the Emit to emit to the coordinator
 
 type NoOpMapper[T any] struct {
 }
