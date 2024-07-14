@@ -9,4 +9,3 @@ In your root directory, navigate to the bin/ folder (`cd bin`) and then you can 
 
 # A small flow diagram
 ![Alt text](./MapReduceFlow.svg)
-<img src="./MapReduceFlow.svg">
