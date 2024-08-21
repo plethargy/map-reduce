@@ -1,12 +1,14 @@
 package main
+
 import (
-    "fmt"
-    "os"
-    "mapreduce/cli"
-    "mapreduce/io"
-    "mapreduce/worker"
-    "mapreduce/partition"
-    "mapreduce/log"
+	"fmt"
+	"mapreduce/cli"
+	"mapreduce/log"
+	mapper "mapreduce/map"
+	"mapreduce/partition"
+	"mapreduce/reduce"
+	"mapreduce/worker"
+	"os"
 )
 
 func main() {
@@ -18,12 +20,18 @@ func main() {
         fmt.Println("Multiprocess mode enabled")
     }
 
-    var mapWorker worker.Worker = &worker.MapWorker{ TestField : "mapper", Status: worker.Idle}
-    var reduceWorker worker.Worker = &worker.ReduceWorker{ TestField: "reducer", Status: worker.Idle }
+    var mapWorker worker.Worker = worker.NewMapWorker("mapper-1", "intermediate-output")
+    var reduceWorker worker.Worker = worker.NewReduceWorker("reducer-1", "reduce-output")
 
     standardCoordinator := worker.NewStandardWorkerCoordinator()
     standardCoordinator.RegisterWorker(mapWorker)
     standardCoordinator.RegisterWorker(reduceWorker)
+    standardCoordinator.RegisterWorker(worker.NewMapWorker("mapper-2", "intermediate-output"))
+    standardCoordinator.RegisterWorker(worker.NewReduceWorker("reducer-2", "reduce-output"))
+    standardCoordinator.RegisterWorker(worker.NewMapWorker("mapper-3", "intermediate-output"))
+    standardCoordinator.RegisterWorker(worker.NewReduceWorker("reducer-3", "reduce-output"))
+    standardCoordinator.RegisterWorker(worker.NewMapWorker("mapper-4", "intermediate-output"))
+    standardCoordinator.RegisterWorker(worker.NewReduceWorker("reducer-4", "reduce-output"))
     standardCoordinator.PrintLists()
 
     os.Setenv("MAPREDUCE_LOG_DEBUG_ENABLED", "enabled")
@@ -31,14 +39,9 @@ func main() {
     logger.Debug("This should only print if debug is enabled!")
     logger.Info("This should always print!")
     logger.Debug("testing out the new sequential byte array")
-    var partialInputReader io.InputStream = io.NewPartialFileReader(5, 'n')
-    partialData, _ := partialInputReader.RetrieveInput("lineBasedTestInput.txt")
-    fmt.Println(string(partialData))
-    partialData, _ = partialInputReader.RetrieveInput("lineBasedTestInput.txt")
-    fmt.Println(string(partialData))
 
     freshDataPartitioner := partition.NewSequentialDataPartitioner(20, "\n")
-    freshDataPartitioner.PartitionInput("lineBasedTestInput.txt")
+    freshDataPartitioner.PartitionInput(options.InputFileName)
 
     partitionedFiles := freshDataPartitioner.RetrieveInputFiles()
 
@@ -46,6 +49,9 @@ func main() {
         standardCoordinator.RegisterInputFile(val, worker.Mapper)
     }
 
-    standardCoordinator.MapReduce(worker.NewMapReduceInput("fakePath", "fakeInput", "fakeOutput"))
+    standardCoordinator.RegisterMapper(&mapper.CountMapper{})
+    standardCoordinator.RegisterReducer(&reduce.CountReducer{})
+
+    standardCoordinator.MapReduce()
 
 }

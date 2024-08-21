@@ -43,10 +43,17 @@ func (swc *StandardWorkerCoordinator) RegisterInputFile(filePath string, workerT
     }
 }
 
-func (swc *StandardWorkerCoordinator) MapReduce(m MapReduceInput) bool {
+func (swc *StandardWorkerCoordinator) MapReduce() bool {
     // we want to ensure every file gets handled before moving to the Reducers 
     // this will iterate through each file and hand it to a MapWorker if one is Idle, if they're all busy it will spin
     // until one becomes Idle.
+    swc.executeMappers()
+    swc.executeReducers()
+
+    return true
+}
+
+func (swc *StandardWorkerCoordinator) executeMappers() {
     var fileIndex = 0
     var wg sync.WaitGroup
     inputFileLength := len(swc.MapperInputFiles)
@@ -57,16 +64,41 @@ func (swc *StandardWorkerCoordinator) MapReduce(m MapReduceInput) bool {
                 worker.SetWorkerStatus(Busy)
                 go func(w Worker, indx int) {
                     defer wg.Done()
-                    worker.ExecuteMap(swc.MapperInputFiles[indx], swc.mapperFunc)
-                    //swc.mapperFunc.Map(mapper.MapInput{})
+                    outputFile := w.ExecuteMap(swc.MapperInputFiles[indx], swc.mapperFunc)
+                    if (outputFile != "") {
+                        swc.RegisterInputFile(outputFile, Reducer)
+                    }
                 }(worker, fileIndex)
                 fileIndex += 1
             }
         }
         wg.Wait()
     }
-    return true
 }
+
+func (swc *StandardWorkerCoordinator) executeReducers() {
+    var fileIndex = 0
+    var wg sync.WaitGroup
+    inputFileLength := len(swc.ReducerInputFiles)
+    for fileIndex < inputFileLength {
+        for _, worker := range swc.ReduceWorkerList {
+            if worker.GetWorkerStatus() == Idle && fileIndex < inputFileLength {
+                wg.Add(1)
+                worker.SetWorkerStatus(Busy)
+                go func(w Worker, indx int) {
+                    defer wg.Done()
+                    outputFile := w.ExecuteReduce(swc.ReducerInputFiles[indx], swc.reducerFunc)
+                    if outputFile != "" {
+                        fmt.Println("Wrote reducer output to: " + outputFile)
+                    }
+                }(worker, fileIndex)
+                fileIndex += 1
+            }
+        }
+        wg.Wait()
+    }
+}
+
 
 func (swc StandardWorkerCoordinator) PrintLists() {
     fmt.Println("The size of reducer list is: ", len(swc.ReduceWorkerList))
