@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"mapreduce/cli"
 	"mapreduce/log"
-	mapper "mapreduce/map"
+	"mapreduce/map"
 	"mapreduce/partition"
 	"mapreduce/reduce"
 	"mapreduce/worker"
