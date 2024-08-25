@@ -18,10 +18,8 @@ type InputStream interface {
 func checkFileExistence(fileName string) bool {
     _, err := os.Stat(fileName)
     if os.IsNotExist(err) {
-        fmt.Println("File does not exist: " + fileName)
         return false
     } else {
-        fmt.Println("File does not exist: " + fileName)
         return true
     }
 }

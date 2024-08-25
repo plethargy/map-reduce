@@ -8,32 +8,53 @@ import (
 	"mapreduce/partition"
 	"mapreduce/reduce"
 	"mapreduce/worker"
+	"encoding/json"
 	"os"
 )
+
+const configFileName string = "config.json"
+
+type Configuration struct {
+    MapWorkerCount int
+    ReduceWorkerCount int
+    MapWorkerOutputPath string
+    ReduceWorkerOutputPath string
+}
 
 func main() {
     for _, val := range os.Args {
         fmt.Println(val)
     }
+    file, _ := os.Open(configFileName)
+    defer file.Close()
+
+    decoder := json.NewDecoder(file)
+    config := Configuration{}
+    err := decoder.Decode(&config)
+    if err != nil {
+	println("Unable to read %s, using default config instead", configFileName)
+	config = NewDefaultConfiguration()
+    }
+
+    println("Using %d map workers and %d reduce workers", config.MapWorkerCount, config.ReduceWorkerCount)
+    
     var options cli.CLIOptions = cli.ParseCommandLineInput()
     if (options.MultiProcess) {
         fmt.Println("Multiprocess mode enabled")
     }
 
-    var mapWorker worker.Worker = worker.NewMapWorker("mapper-1", "intermediate-output")
-    var reduceWorker worker.Worker = worker.NewReduceWorker("reducer-1", "reduce-output")
-
     standardCoordinator := worker.NewStandardWorkerCoordinator()
-    standardCoordinator.RegisterWorker(mapWorker)
-    standardCoordinator.RegisterWorker(reduceWorker)
-    standardCoordinator.RegisterWorker(worker.NewMapWorker("mapper-2", "intermediate-output"))
-    standardCoordinator.RegisterWorker(worker.NewReduceWorker("reducer-2", "reduce-output"))
-    standardCoordinator.RegisterWorker(worker.NewMapWorker("mapper-3", "intermediate-output"))
-    standardCoordinator.RegisterWorker(worker.NewReduceWorker("reducer-3", "reduce-output"))
-    standardCoordinator.RegisterWorker(worker.NewMapWorker("mapper-4", "intermediate-output"))
-    standardCoordinator.RegisterWorker(worker.NewReduceWorker("reducer-4", "reduce-output"))
     standardCoordinator.PrintLists()
 
+    for i := 0; i < config.MapWorkerCount; i++ {
+	mapWorker := worker.NewMapWorker(fmt.Sprintf("mapper-%d", i + 1), config.MapWorkerOutputPath)
+	standardCoordinator.RegisterWorker(mapWorker)
+    }
+
+    for i := 0; i < config.ReduceWorkerCount; i++ {
+	reduceWorker := worker.NewReduceWorker(fmt.Sprintf("reducer-%d", i + 1), config.ReduceWorkerOutputPath)
+	standardCoordinator.RegisterWorker(reduceWorker)
+    }
     os.Setenv("MAPREDUCE_LOG_DEBUG_ENABLED", "enabled")
     logger := log.InitializeLog(log.LogOptions{DebugEnabled: options.LogDebugEnabled})
     logger.Debug("This should only print if debug is enabled!")
@@ -54,4 +75,8 @@ func main() {
 
     standardCoordinator.MapReduce()
 
+}
+
+func NewDefaultConfiguration() Configuration {
+    return Configuration{MapWorkerCount: 1, ReduceWorkerCount: 1, MapWorkerOutputPath: "default-intermediate-output", ReduceWorkerOutputPath: "default-reduce-output"}
 }

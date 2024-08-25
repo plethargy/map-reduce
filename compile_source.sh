@@ -31,3 +31,5 @@ done
 echo "Running go install"
 cd "${modulerootdir}/src"
 $goBin install $mainGoSrcFile
+
+cp config.json ../bin/config.json

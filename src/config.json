@@ -1,0 +1,7 @@
+{
+	"MapWorkerCount": 4,
+	"ReduceWorkerCount" : 4,
+	"MapWorkerOutputPath" : "intermediate-output",
+	"ReduceWorkerOutputPath" : "reduce-output"
+
+}
