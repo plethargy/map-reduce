@@ -9,9 +9,6 @@ In your root directory, navigate to the bin/ folder (`cd bin`) and then you can 
 
 You can specify a file to process using the `--file` argument. (`./mapreduce --file <file_name>`). If no file is specified it will default to look for `stressTest.txt`.
 
-# A small flow diagram
-![Alt text](./resources/map_reduce_flow.svg)
-
 # TODO
 This isn't intended to be used in production and is simply a side project for me, but some future things I'd like to add are:
 
@@ -21,3 +18,7 @@ This isn't intended to be used in production and is simply a side project for me
 * Support the system to work with directories and not files for input and output.
 * Build something to normalize the data before feeding it through.
 * Add an abstraction to utilise Go channels for data transfer instead of files for multi-threaded methods.
+
+# A small flow diagram
+![Alt text](./resources/map_reduce_flow.svg)
+
