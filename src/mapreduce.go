@@ -44,7 +44,6 @@ func main() {
     }
 
     standardCoordinator := worker.NewStandardWorkerCoordinator()
-    standardCoordinator.PrintLists()
 
     for i := 0; i < config.MapWorkerCount; i++ {
 	mapWorker := worker.NewMapWorker(fmt.Sprintf("mapper-%d", i + 1), config.MapWorkerOutputPath)
